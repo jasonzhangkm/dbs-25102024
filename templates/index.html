@@ -5,26 +5,20 @@
     <title>Denomination Exchange</title>
 </head>
 <body>
-    <h1>Denomination Exchange</h1>
+    <h1>Denomination Exchange for Multiple Locations</h1>
     <form action="{{ url_for('perform_exchange') }}" method="POST">
-        <label for="location">Select Location:</label>
-        <select name="location" required>
-            <option value="POS51">POS51</option>
-            <option value="POS52">POS52</option>
-            <option value="Petty Cash">Petty Cash</option>
-            <option value="Safe">Safe</option>
-        </select>
+        {% for location in ['POS51', 'POS52', 'Petty Cash', 'Safe'] %}
+        <h3>{{ location }}</h3>
+        <label for="amount_{{ location }}">Enter Amount to be Exchanged from {{ location }}:</label>
+        <input type="number" name="amount_{{ location }}" step="0.01" required>
         <br><br>
         
-        <label for="amount">Enter Amount to be Exchanged:</label>
-        <input type="number" name="amount" step="0.01" required>
-        <br><br>
-        
-        <label>Select Denominations:</label><br>
-        <input type="checkbox" name="denominations" value="10"> $10<br>
-        <input type="checkbox" name="denominations" value="5"> $5<br>
-        <input type="checkbox" name="denominations" value="2"> $2<br>
+        <label>Select Denominations for {{ location }}:</label><br>
+        <input type="checkbox" name="denominations_{{ location }}" value="10"> $10<br>
+        <input type="checkbox" name="denominations_{{ location }}" value="5"> $5<br>
+        <input type="checkbox" name="denominations_{{ location }}" value="2"> $2<br>
         <br>
+        {% endfor %}
         
         <button type="submit">Perform Exchange</button>
     </form>
