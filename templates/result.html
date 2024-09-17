@@ -2,21 +2,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Exchange Results</title>
+    <title>Exchange Summary</title>
 </head>
 <body>
-    <h1>Exchange Results for {{ location }}</h1>
+    <h1>Summary of Exchanges</h1>
     
+    {% for result in all_results %}
+    <h2>{{ result['location'] }} Exchange</h2>
     <ul>
-        {% for denom, count in result.items() %}
+        {% for denom, count in result['result'].items() %}
         {% if denom != 'total_bills' %}
         <li>${{ denom[1:] }} bills: {{ count }}</li>
         {% endif %}
         {% endfor %}
     </ul>
+    <p>Total Exchanged for {{ result['location'] }}: ${{ result['total_exchanged'] }}</p>
+    {% endfor %}
     
-    <p>Total Exchanged: ${{ total_exchanged }}</p>
-    <p>Total Bills: {{ result['total_bills'] }}</p>
+    <h3>Final Total Amount Exchanged: ${{ total_amount_exchanged }}</h3>
     
     <a href="{{ url_for('index') }}">Perform Another Exchange</a>
 </body>
