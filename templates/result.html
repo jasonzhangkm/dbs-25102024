@@ -1,0 +1,23 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exchange Results</title>
+</head>
+<body>
+    <h1>Exchange Results for {{ location }}</h1>
+    
+    <ul>
+        {% for denom, count in result.items() %}
+        {% if denom != 'total_bills' %}
+        <li>${{ denom[1:] }} bills: {{ count }}</li>
+        {% endif %}
+        {% endfor %}
+    </ul>
+    
+    <p>Total Exchanged: ${{ total_exchanged }}</p>
+    <p>Total Bills: {{ result['total_bills'] }}</p>
+    
+    <a href="{{ url_for('index') }}">Perform Another Exchange</a>
+</body>
+</html>
