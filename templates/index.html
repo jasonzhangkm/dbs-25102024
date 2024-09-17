@@ -1,9 +1,32 @@
-<html>
-    <h1>My First Machine Learning Model in Cloud: DBS price prediction</h1>
-    <form action="/" method="post">
-        <p>Please enter the exchange rate usd to sgd (eg 1.34)</p>
-        <p><input type="number" step="0.01" name="rate"></p>
-        <p><input type="submit" value="Enter"></p>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Denomination Exchange</title>
+</head>
+<body>
+    <h1>Denomination Exchange</h1>
+    <form action="{{ url_for('perform_exchange') }}" method="POST">
+        <label for="location">Select Location:</label>
+        <select name="location" required>
+            <option value="POS51">POS51</option>
+            <option value="POS52">POS52</option>
+            <option value="Petty Cash">Petty Cash</option>
+            <option value="Safe">Safe</option>
+        </select>
+        <br><br>
+        
+        <label for="amount">Enter Amount to be Exchanged:</label>
+        <input type="number" name="amount" step="0.01" required>
+        <br><br>
+        
+        <label>Select Denominations:</label><br>
+        <input type="checkbox" name="denominations" value="10"> $10<br>
+        <input type="checkbox" name="denominations" value="5"> $5<br>
+        <input type="checkbox" name="denominations" value="2"> $2<br>
+        <br>
+        
+        <button type="submit">Perform Exchange</button>
     </form>
-    <p>The predicted DBS share price is {{result}}</p>
+</body>
 </html>
