@@ -1,50 +1,59 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect, url_for
 from pulp import LpProblem, LpMinimize, LpVariable, LpStatus, value
 
 app = Flask(__name__)
 
-# Exchange logic (using your existing functions)
-# Same as before: exchange_denominations, add_constraints, add_two_denom_constraints
+# Function to perform denomination exchange
+def exchange_denominations(T, selected_denominations):
+    model = LpProblem("Denomination_Exchange", LpMinimize)
+    variables = {f'x{denom}': LpVariable(f'x{denom}', lowBound=0, cat='Integer') for denom in selected_denominations}
+    
+    # Objective: Minimize total bills
+    model += sum(variables.values()), "Total_Bills"
+    
+    total_value = sum(int(denom) * variables[f'x{denom}'] for denom in selected_denominations)
+    model += total_value == T, "Total_Value"
+    
+    if '10' in selected_denominations and '5' in selected_denominations:
+        model += 10 * variables['x10'] <= 0.70 * T
+        model += 5 * variables['x5'] <= 0.30 * T
+    
+    model.solve()
+    
+    if LpStatus[model.status] == 'Optimal':
+        return {denom: int(value(variables[f'x{denom}'])) for denom in selected_denominations}
+    else:
+        return None
 
-@app.route('/')
+@app.route('/', methods=['GET', 'POST'])
 def index():
+    if request.method == 'POST':
+        locations = ['POS51', 'POS52', 'Petty Cash', 'Safe']
+        denominations = ['10', '5', '2']
+        all_exchanges = []
+        
+        for location in locations:
+            amount = float(request.form.get(f'amount_{location}'))
+            selected_denom = request.form.getlist(f'denom_{location}')
+            result = exchange_denominations(amount, selected_denom)
+            
+            if result:
+                all_exchanges.append({
+                    'location': location,
+                    'amount': amount,
+                    'result': result,
+                    'total_exchanged': sum(int(denom) * count for denom, count in result.items())
+                })
+
+        total_denominations = {'10': 0, '5': 0, '2': 0}
+        for exchange in all_exchanges:
+            for denom in total_denominations.keys():
+                total_denominations[denom] += exchange['result'].get(denom, 0)
+        
+        total_amount_exchanged = sum(ex['total_exchanged'] for ex in all_exchanges)
+        return render_template('results.html', exchanges=all_exchanges, total_amount=total_amount_exchanged, total_denominations=total_denominations)
+
     return render_template('index.html')
 
-@app.route('/perform_exchange', methods=['POST'])
-def perform_exchange():
-    locations = ['POS51', 'POS52', 'Petty Cash', 'Safe']
-    all_results = []
-    total_amount_exchanged = 0
-
-    for location in locations:
-        # Check if the amount is provided for the location
-        amount_input = request.form.get(f'amount_{location}')
-        if not amount_input:
-            continue  # Skip this location if no amount is entered
-
-        amount = float(amount_input)
-        selected_denominations = request.form.getlist(f'denominations_{location}')
-        
-        # Check if any denomination was selected
-        if not selected_denominations:
-            continue  # Skip this location if no denominations are selected
-
-        result = exchange_denominations(amount, selected_denominations)
-        if result:
-            total_exchanged = sum(result[f'x{denom}'] * int(denom) for denom in selected_denominations)
-            all_results.append({
-                'location': location,
-                'result': result,
-                'total_exchanged': total_exchanged
-            })
-            total_amount_exchanged += total_exchanged
-
-    # Generate a summary after all locations have been processed
-    if all_results:
-        return render_template('result.html', all_results=all_results, total_amount_exchanged=total_amount_exchanged)
-    else:
-        # If no results, display an error page
-        return render_template('error.html', message="No valid exchanges were processed.")
-
-if __name__ == "__main__":
+if __name__ == '__main__':
     app.run(debug=True)
