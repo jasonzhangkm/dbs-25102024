@@ -1,26 +1,31 @@
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Exchange Summary</title>
+    <title>Exchange Results</title>
 </head>
 <body>
-    <h1>Summary of Exchanges</h1>
-    
-    {% for result in all_results %}
-    <h2>{{ result['location'] }} Exchange</h2>
-    <ul>
-        {% for denom, count in result['result'].items() %}
-        {% if denom != 'total_bills' %}
-        <li>${{ denom[1:] }} bills: {{ count }}</li>
-        {% endif %}
-        {% endfor %}
-    </ul>
-    <p>Total Exchanged for {{ result['location'] }}: ${{ result['total_exchanged'] }}</p>
+    <h1>Exchange Summary</h1>
+
+    {% for exchange in exchanges %}
+        <h2>{{ exchange.location }}</h2>
+        <p>Amount Withdrawn: ${{ exchange.amount }}</p>
+        <p>Exchange Result:</p>
+        <ul>
+            {% for denom, count in exchange.result.items() %}
+                <li>${{ denom }} bills: {{ count }} = ${{ count * int(denom) }}</li>
+            {% endfor %}
+        </ul>
+        <p>Total Exchanged for {{ exchange.location }}: ${{ exchange.total_exchanged }}</p>
+        <br>
     {% endfor %}
-    
-    <h3>Final Total Amount Exchanged: ${{ total_amount_exchanged }}</h3>
-    
-    <a href="{{ url_for('index') }}">Perform Another Exchange</a>
+
+    <h2>Total Denominations for Bank</h2>
+    <p>$10 bills: {{ total_denominations['10'] }}</p>
+    <p>$5 bills: {{ total_denominations['5'] }}</p>
+    <p>$2 bills: {{ total_denominations['2'] }}</p>
+
+    <h3>Final Total Amount Exchanged: ${{ total_amount }}</h3>
 </body>
 </html>
