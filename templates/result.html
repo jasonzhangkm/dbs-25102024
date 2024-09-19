@@ -31,27 +31,30 @@
 
     <h1>Denomination Exchange Results</h1>
 
-    {% for location, result in all_results.items() %}
+    {% for result in all_results %}
     <div class="location-result">
-        <h2>{{ location }} Exchange:</h2>
+        <h2>{{ result['location'] }} Exchange:</h2>
+        <p>Withdrawn: ${{ result['amount'] }}</p>
+        <h3>Exchange:</h3>
         <ul>
-            <li>$10 bills: {{ result.get('10', 0) }} = ${{ result.get('10', 0) * 10 }}</li>
-            <li>$5 bills: {{ result.get('5', 0) }} = ${{ result.get('5', 0) * 5 }}</li>
-            <li>$2 bills: {{ result.get('2', 0) }} = ${{ result.get('2', 0) * 2 }}</li>
+            <li>$10 bills: {{ result['10'] }} = ${{ result['10'] * 10 }}</li>
+            <li>$5 bills: {{ result['5'] }} = ${{ result['5'] * 5 }}</li>
+            <li>$2 bills: {{ result['2'] }} = ${{ result['2'] * 2 }}</li>
         </ul>
-        <p>Total Exchanged for {{ location }}: ${{ result['total_bills'] }}</p>
+        <p>Total Exchanged for {{ result['location'] }}: 
+            ${{ result['10'] * 10 }} + ${{ result['5'] * 5 }} + ${{ result['2'] * 2 }} = ${{ result['total_exchanged'] }}
+        </p>
     </div>
     {% endfor %}
-
-    <h3>Final Total Amount Exchanged: ${{ total_amount_exchanged }}</h3>
 
     <div class="final-summary">
         <h3>Final Summary:</h3>
         <ul>
-            <li>$10 bills: {{ final_summary['10'] }}</li>
-            <li>$5 bills: {{ final_summary['5'] }}</li>
-            <li>$2 bills: {{ final_summary['2'] }}</li>
+            <li>$10 bills: {{ final_summary['10'] }} = ${{ final_summary['10'] * 10 }}</li>
+            <li>$5 bills: {{ final_summary['5'] }} = ${{ final_summary['5'] * 5 }}</li>
+            <li>$2 bills: {{ final_summary['2'] }} = ${{ final_summary['2'] * 2 }}</li>
         </ul>
+        <p>Total: ${{ final_summary['10'] * 10 }} + ${{ final_summary['5'] * 5 }} + ${{ final_summary['2'] * 2 }} = ${{ total_amount_exchanged }}</p>
     </div>
 
 </body>
