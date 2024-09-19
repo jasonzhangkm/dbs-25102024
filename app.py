@@ -27,33 +27,38 @@ def exchange_denominations(T, selected_denominations):
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
-    if request.method == 'POST':
-        locations = ['POS51', 'POS52', 'Petty Cash', 'Safe']
-        denominations = ['10', '5', '2']
-        all_exchanges = []
-        
-        for location in locations:
-            amount = float(request.form.get(f'amount_{location}'))
-            selected_denom = request.form.getlist(f'denom_{location}')
-            result = exchange_denominations(amount, selected_denom)
+    try:
+        if request.method == 'POST':
+            locations = ['POS51', 'POS52', 'Petty Cash', 'Safe']
+            denominations = ['10', '5', '2']
+            all_exchanges = []
             
-            if result:
-                all_exchanges.append({
-                    'location': location,
-                    'amount': amount,
-                    'result': result,
-                    'total_exchanged': sum(int(denom) * count for denom, count in result.items())
-                })
+            for location in locations:
+                amount = float(request.form.get(f'amount_{location}'))
+                selected_denom = request.form.getlist(f'denom_{location}')
+                result = exchange_denominations(amount, selected_denom)
+                
+                if result:
+                    all_exchanges.append({
+                        'location': location,
+                        'amount': amount,
+                        'result': result,
+                        'total_exchanged': sum(int(denom) * count for denom, count in result.items())
+                    })
 
-        total_denominations = {'10': 0, '5': 0, '2': 0}
-        for exchange in all_exchanges:
-            for denom in total_denominations.keys():
-                total_denominations[denom] += exchange['result'].get(denom, 0)
-        
-        total_amount_exchanged = sum(ex['total_exchanged'] for ex in all_exchanges)
-        return render_template('results.html', exchanges=all_exchanges, total_amount=total_amount_exchanged, total_denominations=total_denominations)
+            total_denominations = {'10': 0, '5': 0, '2': 0}
+            for exchange in all_exchanges:
+                for denom in total_denominations.keys():
+                    total_denominations[denom] += exchange['result'].get(denom, 0)
 
-    return render_template('index.html')
+            total_amount_exchanged = sum(ex['total_exchanged'] for ex in all_exchanges)
+            return render_template('results.html', exchanges=all_exchanges, total_amount=total_amount_exchanged, total_denominations=total_denominations)
+
+        return render_template('index.html')
+
+    except Exception as e:
+        print(f"Error occurred: {e}")
+        return "An error occurred.", 500
 
 if __name__ == '__main__':
     app.run(debug=True)
