@@ -1,4 +1,4 @@
 flask
 gunicorn
 Flask==2.3.2
-pulp==2.7.0
+pulp==2.6.0
