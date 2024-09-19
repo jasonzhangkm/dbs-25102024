@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Denomination Exchange</title>
+</head>
+<body>
+    <h1>Denomination Exchange</h1>
+    <form method="POST">
+        <h3>Enter the amount to be exchanged from POS51:</h3>
+        <input type="text" name="pos51_amount" required>
+        <h4>Select denominations:</h4>
+        <input type="checkbox" name="pos51_denom" value="10"> $10
+        <input type="checkbox" name="pos51_denom" value="5"> $5
+        <input type="checkbox" name="pos51_denom" value="2"> $2
+        <br><br>
+
+        <h3>Enter the amount to be exchanged from POS52:</h3>
+        <input type="text" name="pos52_amount" required>
+        <h4>Select denominations:</h4>
+        <input type="checkbox" name="pos52_denom" value="10"> $10
+        <input type="checkbox" name="pos52_denom" value="5"> $5
+        <input type="checkbox" name="pos52_denom" value="2"> $2
+        <br><br>
+
+        <h3>Enter the amount to be exchanged from Petty Cash:</h3>
+        <input type="text" name="petty_cash_amount" required>
+        <h4>Select denominations:</h4>
+        <input type="checkbox" name="petty_cash_denom" value="10"> $10
+        <input type="checkbox" name="petty_cash_denom" value="5"> $5
+        <input type="checkbox" name="petty_cash_denom" value="2"> $2
+        <br><br>
+
+        <h3>Enter the amount to be exchanged from Safe:</h3>
+        <input type="text" name="safe_amount" required>
+        <h4>Select denominations:</h4>
+        <input type="checkbox" name="safe_denom" value="10"> $10
+        <input type="checkbox" name="safe_denom" value="5"> $5
+        <input type="checkbox" name="safe_denom" value="2"> $2
+        <br><br>
+
+        <input type="submit" value="Exchange">
+    </form>
+</body>
+</html>
