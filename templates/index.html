@@ -8,48 +8,39 @@
 <body>
     <h1>Denomination Exchange</h1>
     <form method="POST">
-        <div>
-            <label for="amount_POS51">Amount for POS51:</label>
-            <input type="number" name="amount_POS51" step="0.01" required>
-        
-            <p>Select denominations for POS51:</p>
-            <input type="checkbox" name="denom_POS51" value="10"> $10 bills<br>
-            <input type="checkbox" name="denom_POS51" value="5"> $5 bills<br>
-            <input type="checkbox" name="denom_POS51" value="2"> $2 bills<br>
-        </div>
-    
-        <div>
-            <label for="amount_POS52">Amount for POS52:</label>
-            <input type="number" name="amount_POS52" step="0.01" required>
-        
-            <p>Select denominations for POS52:</p>
-            <input type="checkbox" name="denom_POS52" value="10"> $10 bills<br>
-            <input type="checkbox" name="denom_POS52" value="5"> $5 bills<br>
-            <input type="checkbox" name="denom_POS52" value="2"> $2 bills<br>
-        </div>
-    
-        <div>
-            <label for="amount_Petty_Cash">Amount for Petty Cash:</label>
-            <input type="number" name="amount_Petty_Cash" step="0.01" required>
-        
-            <p>Select denominations for Petty Cash:</p>
-            <input type="checkbox" name="denom_Petty_Cash" value="10"> $10 bills<br>
-            <input type="checkbox" name="denom_Petty_Cash" value="5"> $5 bills<br>
-            <input type="checkbox" name="denom_Petty_Cash" value="2"> $2 bills<br>
-        </div>
-    
-        <div>
-            <label for="amount_Safe">Amount for Safe:</label>
-            <input type="number" name="amount_Safe" step="0.01" required>
-        
-            <p>Select denominations for Safe:</p>
-            <input type="checkbox" name="denom_Safe" value="10"> $10 bills<br>
-            <input type="checkbox" name="denom_Safe" value="5"> $5 bills<br>
-            <input type="checkbox" name="denom_Safe" value="2"> $2 bills<br>
-        </div>
+        <h3>Enter the amount to be exchanged from POS51:</h3>
+        <input type="text" name="pos51_amount" required>
+        <h4>Select denominations:</h4>
+        <input type="checkbox" name="pos51_denom" value="10"> $10
+        <input type="checkbox" name="pos51_denom" value="5"> $5
+        <input type="checkbox" name="pos51_denom" value="2"> $2
+        <br><br>
 
-        <button type="submit">Exchange</button>
+        <h3>Enter the amount to be exchanged from POS52:</h3>
+        <input type="text" name="pos52_amount" required>
+        <h4>Select denominations:</h4>
+        <input type="checkbox" name="pos52_denom" value="10"> $10
+        <input type="checkbox" name="pos52_denom" value="5"> $5
+        <input type="checkbox" name="pos52_denom" value="2"> $2
+        <br><br>
+
+        <h3>Enter the amount to be exchanged from Petty Cash:</h3>
+        <input type="text" name="petty_cash_amount" required>
+        <h4>Select denominations:</h4>
+        <input type="checkbox" name="petty_cash_denom" value="10"> $10
+        <input type="checkbox" name="petty_cash_denom" value="5"> $5
+        <input type="checkbox" name="petty_cash_denom" value="2"> $2
+        <br><br>
+
+        <h3>Enter the amount to be exchanged from Safe:</h3>
+        <input type="text" name="safe_amount" required>
+        <h4>Select denominations:</h4>
+        <input type="checkbox" name="safe_denom" value="10"> $10
+        <input type="checkbox" name="safe_denom" value="5"> $5
+        <input type="checkbox" name="safe_denom" value="2"> $2
+        <br><br>
+
+        <input type="submit" value="Exchange">
     </form>
-
 </body>
 </html>
