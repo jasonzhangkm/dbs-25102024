@@ -1,118 +1,97 @@
 from flask import Flask, render_template, request
-from pulp import LpProblem, LpMinimize, LpVariable, LpStatus, value
 
 app = Flask(__name__)
 
-# Function to perform denomination exchange for a single location
-def exchange_denominations(T, selected_denominations):
-    model = LpProblem("Denomination_Exchange", LpMinimize)
+# Function to perform denomination exchange
+def perform_exchange(amount, selected_denom):
+    denom_distribution = {"10": 0, "5": 0, "2": 0}
+    remaining_amount = amount
 
-    # Define decision variables only for selected denominations
-    variables = {f'x{denom}': LpVariable(f'x{denom}', lowBound=0, cat='Integer') for denom in selected_denominations}
+    # Exchange for $10 bills
+    if "10" in selected_denom:
+        denom_distribution["10"] = remaining_amount // 10
+        remaining_amount = remaining_amount % 10
 
-    # Objective: Minimize the total number of bills
-    model += sum(variables.values()), "Total_Bills"
+    # Exchange for $5 bills
+    if "5" in selected_denom:
+        denom_distribution["5"] = remaining_amount // 5
+        remaining_amount = remaining_amount % 5
 
-    # Constraints: Ensure the total value equals T
-    total_value = sum(int(denom) * variables[f'x{denom}'] for denom in selected_denominations)
-    model += total_value == T, "Total_Value"
+    # Exchange for $2 bills
+    if "2" in selected_denom:
+        denom_distribution["2"] = remaining_amount // 2
+        remaining_amount = remaining_amount % 2
 
-    # Add constraints based on selected denominations
-    add_constraints(model, variables, selected_denominations, T)
+    # If the remaining amount is not zero and no denomination can cover it, throw an error
+    if remaining_amount != 0:
+        raise ValueError(f"Cannot exchange remaining amount of ${remaining_amount} with available denominations.")
 
-    # Solve the model
-    model.solve()
+    return denom_distribution
 
-    # Check if the solution is optimal
-    if LpStatus[model.status] == 'Optimal':
-        result = {f'x{denom}': int(value(variables[f'x{denom}'])) for denom in selected_denominations}
-        result['total_bills'] = sum(result[f'x{denom}'] for denom in selected_denominations)
-        return result
-    else:
-        return None
-
-# Function to add constraints based on selected denominations
-def add_constraints(model, variables, selected_denominations, T):
-    if set(selected_denominations) == set(['10', '5', '2']):
-        model += 10 * variables['x10'] <= 0.70 * T
-        model += 10 * variables['x10'] >= 0.60 * T
-        model += 5 * variables['x5'] <= 0.32 * T
-        model += 5 * variables['x5'] >= 0.22 * T
-        model += 2 * variables['x2'] <= 0.18 * T
-        model += 2 * variables['x2'] >= 0.08 * T
-    elif len(selected_denominations) == 1:
-        denom_value = int(selected_denominations[0])
-        model += denom_value * variables[f'x{denom_value}'] == T
-    elif len(selected_denominations) == 2:
-        add_two_denom_constraints(model, variables, selected_denominations, T)
-
-# Function to handle two-denomination cases
-def add_two_denom_constraints(model, variables, selected_denominations, T):
-    denom_set = set(selected_denominations)
-    if denom_set == set(['10', '5']):
-        model += 10 * variables['x10'] <= 0.80 * T
-        model += 10 * variables['x10'] >= 0.70 * T
-        model += 5 * variables['x5'] <= 0.30 * T
-        model += 5 * variables['x5'] >= 0.20 * T
-    elif denom_set == set(['10', '2']):
-        model += 10 * variables['x10'] <= 0.90 * T
-        model += 10 * variables['x10'] >= 0.80 * T
-        model += 2 * variables['x2'] <= 0.20 * T
-        model += 2 * variables['x2'] >= 0.10 * T
-    elif denom_set == set(['5', '2']):
-        model += 5 * variables['x5'] <= 0.75 * T
-        model += 5 * variables['x5'] >= 0.65 * T
-        model += 2 * variables['x2'] <= 0.35 * T
-        model += 2 * variables['x2'] >= 0.25 * T
-
+# Route for the home page
 @app.route('/', methods=['GET', 'POST'])
 def index():
     if request.method == 'POST':
         try:
-            locations = ['POS51', 'POS52', 'Petty_Cash', 'Safe']
+            # Input amounts for each location
+            pos51_amount = float(request.form['pos51_amount'])
+            pos52_amount = float(request.form['pos52_amount'])
+            petty_cash_amount = float(request.form['petty_cash_amount'])
+            safe_amount = float(request.form['safe_amount'])
+
+            # Input selected denominations for each location
+            pos51_denom = request.form.getlist('pos51_denom')
+            pos52_denom = request.form.getlist('pos52_denom')
+            petty_cash_denom = request.form.getlist('petty_cash_denom')
+            safe_denom = request.form.getlist('safe_denom')
+
             all_results = []
             total_amount_exchanged = 0
-            final_summary = {'10': 0, '5': 0, '2': 0}
+            final_summary = {"10": 0, "5": 0, "2": 0}
 
-            # Loop through each location and perform the exchange
-            for location in locations:
-                amount = float(request.form.get(f'amount_{location}'))
-                selected_denom = request.form.getlist(f'denom_{location}')
-                
-                # Validate amount and denomination selection
-                if not amount or not selected_denom:
-                    raise ValueError(f"Invalid input for {location}: amount={amount}, selected_denom={selected_denom}")
-                
-                # Only proceed with the exchange if there is at least one denomination selected
-                if len(selected_denom) == 0:
-                    raise ValueError(f"No denominations selected for {location}. Please select at least one.")
+            # POS51 Exchange
+            pos51_result = perform_exchange(pos51_amount, pos51_denom)
+            pos51_total = sum(pos51_result[denom] * int(denom) for denom in pos51_result)
+            all_results.append({"location": "POS51", **pos51_result, "total_exchanged": pos51_total})
+            total_amount_exchanged += pos51_total
+            final_summary["10"] += pos51_result["10"]
+            final_summary["5"] += pos51_result["5"]
+            final_summary["2"] += pos51_result["2"]
 
-                # Perform the exchange
-                result = exchange_denominations(amount, selected_denom)
-                if result:
-                    total_exchanged = 0
-                    for denom in selected_denom:
-                        count = result[f'x{denom}']
-                        value = count * int(denom)
-                        total_exchanged += value
-                        final_summary[denom] += count
+            # POS52 Exchange
+            pos52_result = perform_exchange(pos52_amount, pos52_denom)
+            pos52_total = sum(pos52_result[denom] * int(denom) for denom in pos52_result)
+            all_results.append({"location": "POS52", **pos52_result, "total_exchanged": pos52_total})
+            total_amount_exchanged += pos52_total
+            final_summary["10"] += pos52_result["10"]
+            final_summary["5"] += pos52_result["5"]
+            final_summary["2"] += pos52_result["2"]
 
-                    all_results.append({
-                        "location": location,
-                        "amount": amount,
-                        "result": result,
-                        "total_exchanged": total_exchanged
-                    })
-                    total_amount_exchanged += total_exchanged
-                else:
-                    raise ValueError(f"No optimal solution found for {location}.")
+            # Petty Cash Exchange
+            petty_cash_result = perform_exchange(petty_cash_amount, petty_cash_denom)
+            petty_cash_total = sum(petty_cash_result[denom] * int(denom) for denom in petty_cash_result)
+            all_results.append({"location": "Petty Cash", **petty_cash_result, "total_exchanged": petty_cash_total})
+            total_amount_exchanged += petty_cash_total
+            final_summary["10"] += petty_cash_result["10"]
+            final_summary["5"] += petty_cash_result["5"]
+            final_summary["2"] += petty_cash_result["2"]
+
+            # Safe Exchange
+            safe_result = perform_exchange(safe_amount, safe_denom)
+            safe_total = sum(safe_result[denom] * int(denom) for denom in safe_result)
+            all_results.append({"location": "Safe", **safe_result, "total_exchanged": safe_total})
+            total_amount_exchanged += safe_total
+            final_summary["10"] += safe_result["10"]
+            final_summary["5"] += safe_result["5"]
+            final_summary["2"] += safe_result["2"]
 
             return render_template('results.html', all_results=all_results, total_amount_exchanged=total_amount_exchanged, final_summary=final_summary)
 
-        except ValueError as e:
+        except Exception as e:
             return f"An error occurred: {e}"
 
     return render_template('index.html')
 
+# Run the app
 if __name__ == '__main__':
     app.run(debug=True)
