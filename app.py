@@ -80,9 +80,11 @@ def index():
         final_summary = {'10': 0, '5': 0, '2': 0}
         for location, result in results.items():
             if result:
-                total_amount_exchanged += sum([int(denom) * result[denom] for denom in result.keys()])
+                # Exclude 'total_bills' from the calculation
+                total_amount_exchanged += sum([int(denom) * result[denom] for denom in result if denom.isdigit()])
                 for denom in result.keys():
-                    final_summary[denom] += result[denom]
+                    if denom.isdigit():  # Only update summary for numeric denominations
+                        final_summary[denom] += result[denom]
 
         return render_template('result.html', all_results=results, total_amount_exchanged=total_amount_exchanged, final_summary=final_summary)
 
