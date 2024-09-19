@@ -38,21 +38,20 @@
             <li>$10 bills: {{ result['10'] }} = ${{ result['10'] * 10 }}</li>
             <li>$5 bills: {{ result['5'] }} = ${{ result['5'] * 5 }}</li>
             <li>$2 bills: {{ result['2'] }} = ${{ result['2'] * 2 }}</li>
+            <li>Total Exchanged: ${{ result['total_exchanged'] }}</li>
         </ul>
-        <p>Total Exchanged for {{ result['location'] }}: ${{ result['total_exchanged'] }}</p>
     </div>
     {% endfor %}
 
-    <h3>Final Total Amount Exchanged: ${{ total_amount_exchanged }}</h3>
-
     <div class="final-summary">
-        <h3>Final Summary:</h3>
+        <h3>Final Summary</h3>
+        <p>Total Amount Exchanged: ${{ total_amount_exchanged }}</p>
         <ul>
-            <li>$10 bills: {{ final_summary['10'] }}</li>
-            <li>$5 bills: {{ final_summary['5'] }}</li>
-            <li>$2 bills: {{ final_summary['2'] }}</li>
+            <li>Total $10 bills: {{ final_summary['10'] }}</li>
+            <li>Total $5 bills: {{ final_summary['5'] }}</li>
+            <li>Total $2 bills: {{ final_summary['2'] }}</li>
         </ul>
     </div>
 
 </body>
-</html
+</html>
